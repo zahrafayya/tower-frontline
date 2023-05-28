@@ -7,14 +7,20 @@ public class Pawn : MonoBehaviour
 {
     [SerializeField] private float speed;
     [SerializeField] private int idleDuration;
+    [SerializeField] private float attackRange; // New variable for attack range
     
     private GameObject childObjectAnimation;
     private Animator animator;
-
-    private GameObject childObjectHealth;
     
     private String currentAction = "";
     private String promptedAction = "Run";
+
+    private bool isHurting = false;
+
+    private HealthBar enemyHealthBar;
+
+    private bool canDecreaseHealth = true; // Flag to control the delay
+
     public enum Action
     {
         Run,
@@ -51,7 +57,6 @@ public class Pawn : MonoBehaviour
         
 
         float moveAmount = speed * Time.deltaTime;
-
         transform.Translate(Vector3.right * moveAmount);
 
     }
@@ -62,6 +67,7 @@ public class Pawn : MonoBehaviour
         {
             SetAnimationAttack();
             currentAction = "Attack";
+            isHurting = true;
         }
     }
 
@@ -69,25 +75,57 @@ public class Pawn : MonoBehaviour
     {
         childObjectAnimation = transform.Find("Animation").gameObject;
         animator = childObjectAnimation.GetComponent<Animator>();
-        
-        childObjectHealth = transform.Find("HealthBar").gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(promptedAction.Equals("Run")) Run(); 
+        if(promptedAction.Equals("Run"))
+        {
+            Run();
+
+            // // Check if the distance to the enemy is less than or equal to the attack range
+            // if (Vector3.Distance(transform.position, enemy.transform.position) <= attackRange)
+            // {
+            //     promptedAction = "Attack";
+            // }
+        }
         else if (promptedAction.Equals("Attack"))
         {
             Attack();
         }
     }
     
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            promptedAction = "Attack";
+            if(!promptedAction.Equals("Attack"))
+            {
+                promptedAction = "Attack";
+                enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
+            }
         }
+
+        if (currentAction.Equals("Attack"))
+        {
+            DecreaseEnemyHealthBar();
+        }
+    }
+
+    public void DecreaseEnemyHealthBar()
+    {
+        if (canDecreaseHealth)
+        {
+            canDecreaseHealth = false;
+            StartCoroutine(ResetDecreaseHealthFlag());
+            enemyHealthBar.DecreaseHealth();
+        }
+    }
+
+    private IEnumerator ResetDecreaseHealthFlag()
+    {
+        yield return new WaitForSeconds(0.5f); // Wait for half a second
+        canDecreaseHealth = true; // Set the flag to true
     }
 }
