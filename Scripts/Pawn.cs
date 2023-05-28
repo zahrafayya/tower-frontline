@@ -11,15 +11,19 @@ public class Pawn : MonoBehaviour
     
     private GameObject childObjectAnimation;
     private Animator animator;
+
+    private float time = 0.0f;
+    public float interpolationPeriod = 0.5f;
     
     private String currentAction = "";
     private String promptedAction = "Run";
 
-    private bool isHurting = false;
+    private float targetAttackInterval = 0.5f * 60;
+    private float attackInterval = 0;
 
     private HealthBar enemyHealthBar;
 
-    private bool canDecreaseHealth = true; // Flag to control the delay
+    private bool canDecreaseHealth = false; // Flag to control the delay
 
     public enum Action
     {
@@ -63,12 +67,8 @@ public class Pawn : MonoBehaviour
 
     private void Attack()
     {
-        if (!currentAction.Equals("Attack"))
-        {
-            SetAnimationAttack();
-            currentAction = "Attack";
-            isHurting = true;
-        }
+        SetAnimationAttack();
+        currentAction = "Attack";
     }
 
     void Start()
@@ -80,6 +80,18 @@ public class Pawn : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float targetDeltaTime = 1f / 60f; // Desired time per frame for 60 FPS
+        float deltaTime = Time.deltaTime;
+
+        time += Time.deltaTime;
+
+        if (deltaTime < targetDeltaTime)
+        {
+            float remainingTime = targetDeltaTime - deltaTime;
+            System.Threading.Thread.Sleep((int)(remainingTime * 1000));
+            deltaTime = Time.deltaTime;
+        }
+
         if(promptedAction.Equals("Run"))
         {
             Run();
@@ -90,9 +102,20 @@ public class Pawn : MonoBehaviour
             //     promptedAction = "Attack";
             // }
         }
-        else if (promptedAction.Equals("Attack"))
+        else if (promptedAction.Equals("Attack") && !currentAction.Equals("Attack"))
         {
             Attack();
+        }
+        else if(currentAction.Equals("Attack"))
+        {
+
+            if (time >= interpolationPeriod) {
+                time = time - interpolationPeriod;
+        
+                if(!canDecreaseHealth)
+                    canDecreaseHealth = true;
+            }
+            
         }
     }
     
@@ -118,7 +141,6 @@ public class Pawn : MonoBehaviour
         if (canDecreaseHealth)
         {
             canDecreaseHealth = false;
-            StartCoroutine(ResetDecreaseHealthFlag());
             enemyHealthBar.DecreaseHealth();
         }
     }
