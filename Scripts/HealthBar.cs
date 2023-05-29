@@ -18,7 +18,7 @@ public class HealthBar : MonoBehaviour
 
     public void DecreaseHealth()
     {
-        currentHealth -= 10;
+        currentHealth -= 5;
 
         float healthPercentage = (float)currentHealth / maxHealth;
         print("health percentage");
@@ -35,7 +35,7 @@ public class HealthBar : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            // Defeated, add code if needed
+            Destroy(gameObject);
         }
     }
 }

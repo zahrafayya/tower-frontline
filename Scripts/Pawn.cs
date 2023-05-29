@@ -23,7 +23,7 @@ public class Pawn : MonoBehaviour
 
     private HealthBar enemyHealthBar;
 
-    private bool canDecreaseHealth = false; // Flag to control the delay
+    private bool canDecreaseHealth = true; // Flag to control the delay
 
     public enum Action
     {
@@ -108,14 +108,12 @@ public class Pawn : MonoBehaviour
         }
         else if(currentAction.Equals("Attack"))
         {
-
-            if (time >= interpolationPeriod) {
-                time = time - interpolationPeriod;
-        
-                if(!canDecreaseHealth)
-                    canDecreaseHealth = true;
+            if (canDecreaseHealth)
+            {
+                DecreaseEnemyHealthBar();
+                canDecreaseHealth = false;
+                StartCoroutine(ResetDecreaseHealthFlag());
             }
-            
         }
     }
     
@@ -129,18 +127,12 @@ public class Pawn : MonoBehaviour
                 enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
             }
         }
-
-        if (currentAction.Equals("Attack"))
-        {
-            DecreaseEnemyHealthBar();
-        }
     }
 
     public void DecreaseEnemyHealthBar()
     {
         if (canDecreaseHealth)
         {
-            canDecreaseHealth = false;
             enemyHealthBar.DecreaseHealth();
         }
     }
