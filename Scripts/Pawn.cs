@@ -14,7 +14,6 @@ public class Pawn : MonoBehaviour
     }
     
     [SerializeField] private float speed;
-    [SerializeField] private float attackTime;
     [SerializeField] private int attackDamage;
     [SerializeField] private float idleDuration;
 
@@ -25,8 +24,8 @@ public class Pawn : MonoBehaviour
     private GameObject childObjectAnimation;
     private Animator animator;
     private HealthBar enemyHealthBar;
-
-    private bool canDecreaseHealth = false; // Flag to control the delay
+    
+    private bool isDoneIdling = false;
 
     // Animation Controller
     
@@ -68,45 +67,38 @@ public class Pawn : MonoBehaviour
 
     private void Attack()
     {
-        SetAnimationAttack();
-
         if (currentAction != Action.Attack)
         {
-            currentAction = Action.Attack;
-            StartCoroutine(ResetDecreaseHealthFlag());
+            StartCoroutine(AttackWait());
         }
         else if (!enemyHealthBar) // musuh sudah mati
         {
             promptedAction = Action.Run;
-        }
-        else
-        {
-            if (canDecreaseHealth)
-            {
-
-                canDecreaseHealth = false;
-                StartCoroutine(ResetDecreaseHealthFlag());
-            }
-
-            // promptedAction = Action.Idle;
         }
     }
 
     private void Idle()
     {
         SetAnimationIdle();
+        
         if (currentAction != Action.Idle)
         {
             currentAction = Action.Idle;
+            StartCoroutine(IdleWait());
         }
 
-        StartCoroutine(IdleWait());
+        if (isDoneIdling)
+        {
+            promptedAction = Action.Attack;
+            isDoneIdling = false;
+        }
     }
 
     void Start()
     {
-        childObjectAnimation = transform.Find("Animation").gameObject;
-        animator = childObjectAnimation.GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
+        
+        AnimationTrigger eventTrigger = animator.gameObject.AddComponent<AnimationTrigger>();
     }
     
     void Update()
@@ -142,32 +134,29 @@ public class Pawn : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
-            if(promptedAction != Action.Attack)
+            if(promptedAction != Action.Idle)
             {
-                promptedAction = Action.Attack;
+                promptedAction = Action.Idle;
             }
         }
     }
     
     // Utils
-    public void DecreaseEnemyHealthBar()
+    public void OnAnimationEvent(string eventData)
     {
-        if (canDecreaseHealth)
-        {
-            enemyHealthBar.DecreaseHealth(attackDamage);
-        }
+        if (eventData.Equals("Hit")) enemyHealthBar.DecreaseHealth(attackDamage);
+        else if (eventData.Equals("IdleStart")) promptedAction = Action.Idle;
     }
-
-    private IEnumerator ResetDecreaseHealthFlag()
-    {
-        yield return new WaitForSeconds(attackTime); // Wait for half a second
-        canDecreaseHealth = true;
-        DecreaseEnemyHealthBar();// Set the flag to true
-    }
-    
     private IEnumerator IdleWait()
     {
-        yield return new WaitForSeconds(idleDuration); // Wait for half a second
-        promptedAction = Action.Attack;
+        yield return new WaitForSeconds(idleDuration);
+        isDoneIdling = true;
+    }
+
+    private IEnumerator AttackWait()
+    {
+        yield return new WaitForSeconds(0.4f);
+        currentAction = Action.Attack;
+        SetAnimationAttack();
     }
 }
