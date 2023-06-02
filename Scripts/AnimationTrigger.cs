@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class AnimationTrigger : MonoBehaviour
 {
-    private Pawn eventListener;
+    private Pawn pawn;
 
     void Start()
     {
-        eventListener = GetComponentInParent<Pawn>();
+        pawn = GetComponentInParent<Pawn>();
     }
 
     // This method will be called by the AnimationEvent
     public void TriggerAnimationEvent(string eventData)
     {
-        eventListener.OnAnimationEvent(eventData);
+        pawn.OnAnimationEvent(eventData);
     }
 }

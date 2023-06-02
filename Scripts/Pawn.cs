@@ -97,8 +97,6 @@ public class Pawn : MonoBehaviour
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
-        
-        AnimationTrigger eventTrigger = animator.gameObject.AddComponent<AnimationTrigger>();
     }
     
     void Update()

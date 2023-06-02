@@ -6,14 +6,17 @@ using UnityEngine.UI;
 public class HealthBar : MonoBehaviour
 {
     public int maxHealth = 100; // Maximum health value
+    
     private Transform childObjectHealth;
+    private Pawn pawn;
     private float actualDamage;
-
     private int currentHealth; // Current health value
 
     void Start()
     {
         currentHealth = maxHealth;
+        pawn = GetComponent<Pawn>();
+        
         childObjectHealth = transform.Find("HealthBar");
     }
 

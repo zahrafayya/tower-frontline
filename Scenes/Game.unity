@@ -220,7 +220,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  attackTime: 0
   attackDamage: 0
   idleDuration: 0
 --- !u!114 &88410462
@@ -247,6 +246,7 @@ GameObject:
   - component: {fileID: 127618833}
   - component: {fileID: 127618835}
   - component: {fileID: 127618834}
+  - component: {fileID: 127618836}
   m_Layer: 0
   m_Name: Animation
   m_TagString: Untagged
@@ -341,6 +341,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &127618836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127618832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dac85cd189f89743bd06a22f3bdb2f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &175334660
 GameObject:
   m_ObjectHideFlags: 0
@@ -3772,9 +3784,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  attackTime: 0.5
   attackDamage: 10
-  idleDuration: 0.5
+  idleDuration: 1
 --- !u!61 &646265040
 BoxCollider2D:
   m_ObjectHideFlags: 0
