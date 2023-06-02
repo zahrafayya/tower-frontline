@@ -22,20 +22,23 @@ public class HealthBar : MonoBehaviour
 
     public void DecreaseHealth(int damage)
     {
-        currentHealth -= damage;
-
-        float healthPercentage = (float)currentHealth / maxHealth;
-
-        float newScaleX = healthPercentage;
-
-        Vector3 newScale = childObjectHealth.localScale;
-        newScale.x = newScaleX;
-
-        childObjectHealth.localScale = newScale;
-
-        if (currentHealth <= 0)
+        if (currentHealth > 0)
         {
-            Destroy(gameObject);
+            currentHealth -= damage;
+
+            float healthPercentage = (float)currentHealth / maxHealth;
+
+            float newScaleX = healthPercentage * 0.7f;
+
+            Vector3 newScale = childObjectHealth.localScale;
+            newScale.x = newScaleX;
+
+            childObjectHealth.localScale = newScale;
+
+            if (currentHealth <= 0)
+            {
+                pawn.OnDeadEvent();
+            }
         }
     }
 }

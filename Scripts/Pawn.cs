@@ -10,7 +10,8 @@ public class Pawn : MonoBehaviour
         Null,
         Run,
         Attack,
-        Idle
+        Idle,
+        Dead
     }
     
     [SerializeField] private float speed;
@@ -28,6 +29,13 @@ public class Pawn : MonoBehaviour
     private bool isDoneIdling = false;
 
     // Animation Controller
+    private void SetAnimationDead()
+    {
+        animator.SetBool("isAttack", false);
+        animator.SetBool("isRun", false);
+        animator.SetBool("isIdle", false);
+        animator.SetBool("isDead", true);
+    }
     
     private void SetAnimationIdle()
     {
@@ -50,6 +58,13 @@ public class Pawn : MonoBehaviour
     }
     
     // Action Controller
+    private void Dead()
+    {
+        promptedAction = Action.Dead;
+        currentAction = Action.Dead;
+        
+        SetAnimationDead();
+    }
     private void Run()
     {
         if (currentAction != Action.Run)
@@ -132,7 +147,7 @@ public class Pawn : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
-            if(promptedAction != Action.Idle)
+            if(promptedAction != Action.Idle && enemyHealthBar)
             {
                 promptedAction = Action.Idle;
             }
@@ -144,6 +159,12 @@ public class Pawn : MonoBehaviour
     {
         if (eventData.Equals("Hit")) enemyHealthBar.DecreaseHealth(attackDamage);
         else if (eventData.Equals("IdleStart")) promptedAction = Action.Idle;
+        else if (eventData.Equals("Disappear")) Destroy(gameObject);
+    }
+    
+    public void OnDeadEvent()
+    {
+        Dead();
     }
     private IEnumerator IdleWait()
     {
