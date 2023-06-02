@@ -6,15 +6,24 @@ using UnityEngine.UI;
 public class HealthBar : MonoBehaviour
 {
     public int maxHealth = 100; // Maximum health value
+    
     private Transform childObjectHealth;
     private float actualDamage;
-
     private int currentHealth; // Current health value
+    
+    private Pawn eventListener;
 
     void Start()
     {
         currentHealth = maxHealth;
         childObjectHealth = transform.Find("HealthBar");
+    }
+    
+    public void Initialize(Pawn listener)
+    {
+        eventListener = gameObject.AddComponent<Pawn>();
+            
+        if (!listener) eventListener = listener;
     }
 
     public void DecreaseHealth(int damage)
@@ -24,6 +33,8 @@ public class HealthBar : MonoBehaviour
         float healthPercentage = (float)currentHealth / maxHealth;
 
         float newScaleX = healthPercentage;
+        
+        print(currentHealth);
 
         Vector3 newScale = childObjectHealth.localScale;
         newScale.x = newScaleX;
@@ -34,5 +45,10 @@ public class HealthBar : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+    
+    public void TriggerDeadAnimation()
+    {
+        eventListener.OnDeadEvent();
     }
 }

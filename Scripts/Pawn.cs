@@ -10,11 +10,11 @@ public class Pawn : MonoBehaviour
         Null,
         Run,
         Attack,
-        Idle
+        Idle,
+        Dead
     }
     
     [SerializeField] private float speed;
-    [SerializeField] private float attackTime;
     [SerializeField] private int attackDamage;
     [SerializeField] private float idleDuration;
 
@@ -25,10 +25,18 @@ public class Pawn : MonoBehaviour
     private GameObject childObjectAnimation;
     private Animator animator;
     private HealthBar enemyHealthBar;
-
-    private bool canDecreaseHealth = false; // Flag to control the delay
+    
+    private bool isDoneIdling = false;
 
     // Animation Controller
+
+    private void SetAnimationDead()
+    {
+        animator.SetBool("isAttack", false);
+        animator.SetBool("isRun", false);
+        animator.SetBool("isIdle", false);
+        animator.SetBool("isDead", true);
+    }
     
     private void SetAnimationIdle()
     {
@@ -51,6 +59,14 @@ public class Pawn : MonoBehaviour
     }
     
     // Action Controller
+    private void Dead()
+    {
+        promptedAction = Action.Dead;
+        currentAction = Action.Dead;
+        
+        SetAnimationDead();
+    }
+    
     private void Run()
     {
         if (currentAction != Action.Run)
@@ -68,45 +84,39 @@ public class Pawn : MonoBehaviour
 
     private void Attack()
     {
-        SetAnimationAttack();
-
         if (currentAction != Action.Attack)
         {
-            currentAction = Action.Attack;
-            StartCoroutine(ResetDecreaseHealthFlag());
+            StartCoroutine(AttackWait());
         }
         else if (!enemyHealthBar) // musuh sudah mati
         {
             promptedAction = Action.Run;
-        }
-        else
-        {
-            if (canDecreaseHealth)
-            {
-
-                canDecreaseHealth = false;
-                StartCoroutine(ResetDecreaseHealthFlag());
-            }
-
-            // promptedAction = Action.Idle;
         }
     }
 
     private void Idle()
     {
         SetAnimationIdle();
+        
         if (currentAction != Action.Idle)
         {
             currentAction = Action.Idle;
+            StartCoroutine(IdleWait());
         }
 
-        StartCoroutine(IdleWait());
+        if (isDoneIdling)
+        {
+            promptedAction = Action.Attack;
+            isDoneIdling = false;
+        }
     }
 
     void Start()
     {
-        childObjectAnimation = transform.Find("Animation").gameObject;
-        animator = childObjectAnimation.GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
+        
+        HitTrigger eventTrigger = animator.gameObject.AddComponent<HitTrigger>();
+        eventTrigger.Initialize(this);
     }
     
     void Update()
@@ -150,24 +160,28 @@ public class Pawn : MonoBehaviour
     }
     
     // Utils
-    public void DecreaseEnemyHealthBar()
+    public void OnAnimationEvent(string eventData)
     {
-        if (canDecreaseHealth)
-        {
-            enemyHealthBar.DecreaseHealth(attackDamage);
-        }
+        if (eventData.Equals("Hit")) enemyHealthBar.DecreaseHealth(attackDamage);
+        else if (eventData.Equals("IdleStart")) promptedAction = Action.Idle;
+        // else if (eventData.Equals("Disappear")) Destroy(gameObject);
     }
 
-    private IEnumerator ResetDecreaseHealthFlag()
+    public void OnDeadEvent()
     {
-        yield return new WaitForSeconds(attackTime); // Wait for half a second
-        canDecreaseHealth = true;
-        DecreaseEnemyHealthBar();// Set the flag to true
+        Dead();
     }
     
     private IEnumerator IdleWait()
     {
-        yield return new WaitForSeconds(idleDuration); // Wait for half a second
-        promptedAction = Action.Attack;
+        yield return new WaitForSeconds(idleDuration);
+        isDoneIdling = true;
+    }
+
+    private IEnumerator AttackWait()
+    {
+        yield return new WaitForSeconds(0.4f);
+        currentAction = Action.Attack;
+        SetAnimationAttack();
     }
 }
