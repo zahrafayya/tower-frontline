@@ -5,70 +5,102 @@ using UnityEngine;
 
 public class Pawn : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private int idleDuration;
-    [SerializeField] private float attackRange; // New variable for attack range
-    
-    private GameObject childObjectAnimation;
-    private Animator animator;
-
-    private float time = 0.0f;
-    public float interpolationPeriod = 0.5f;
-    
-    private String currentAction = "";
-    private String promptedAction = "Run";
-
-    private float targetAttackInterval = 0.5f * 60;
-    private float attackInterval = 0;
-
-    private HealthBar enemyHealthBar;
-
-    private bool canDecreaseHealth = true; // Flag to control the delay
-
     public enum Action
     {
+        Null,
         Run,
         Attack,
         Idle
     }
+    
+    [SerializeField] private float speed;
+    [SerializeField] private float attackTime;
+    [SerializeField] private int attackDamage;
+    [SerializeField] private float idleDuration;
 
-    public void GetAction()
-    {
-        
-    }
+    private float time = 0.0f;
+    private Action currentAction = Action.Null;
+    private Action promptedAction = Action.Run;
+    
+    private GameObject childObjectAnimation;
+    private Animator animator;
+    private HealthBar enemyHealthBar;
+
+    private bool canDecreaseHealth = false; // Flag to control the delay
 
     // Animation Controller
+    
+    private void SetAnimationIdle()
+    {
+        animator.SetBool("isAttack", false);
+        animator.SetBool("isRun", false);
+        animator.SetBool("isIdle", true);
+    }
     private void SetAnimationRun()
     {
         animator.SetBool("isAttack", false);
         animator.SetBool("isRun", true);
+        animator.SetBool("isIdle", false);
     }
     
     private void SetAnimationAttack()
     {
         animator.SetBool("isAttack", true);
         animator.SetBool("isRun", false);
+        animator.SetBool("isIdle", false);
     }
     
     // Action Controller
     private void Run()
     {
-        if (!currentAction.Equals("Run"))
+        if (currentAction != Action.Run)
         {
             SetAnimationRun();
-            currentAction = "Run";
+            currentAction = Action.Run;
         }
         
-
-        float moveAmount = speed * Time.deltaTime;
-        transform.Translate(Vector3.right * moveAmount);
-
+        if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.Equals(("Run")))
+        {
+            float moveAmount = speed * Time.deltaTime;
+            transform.Translate(Vector3.right * moveAmount);
+        }
     }
 
     private void Attack()
     {
         SetAnimationAttack();
-        currentAction = "Attack";
+
+        if (currentAction != Action.Attack)
+        {
+            currentAction = Action.Attack;
+            StartCoroutine(ResetDecreaseHealthFlag());
+        }
+        else if (!enemyHealthBar) // musuh sudah mati
+        {
+            promptedAction = Action.Run;
+        }
+        else
+        {
+            if (canDecreaseHealth)
+            {
+
+                canDecreaseHealth = false;
+                StartCoroutine(ResetDecreaseHealthFlag());
+            }
+
+            // promptedAction = Action.Idle;
+        }
+    }
+
+    private void Idle()
+    {
+        SetAnimationIdle();
+        if (currentAction != Action.Idle)
+        {
+            currentAction = Action.Idle;
+        }
+
+        StartCoroutine(IdleWait());
     }
 
     void Start()
@@ -76,8 +108,7 @@ public class Pawn : MonoBehaviour
         childObjectAnimation = transform.Find("Animation").gameObject;
         animator = childObjectAnimation.GetComponent<Animator>();
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         float targetDeltaTime = 1f / 60f; // Desired time per frame for 60 FPS
@@ -92,54 +123,51 @@ public class Pawn : MonoBehaviour
             deltaTime = Time.deltaTime;
         }
 
-        if(promptedAction.Equals("Run"))
+        if(promptedAction == Action.Run)
         {
             Run();
-
-            // // Check if the distance to the enemy is less than or equal to the attack range
-            // if (Vector3.Distance(transform.position, enemy.transform.position) <= attackRange)
-            // {
-            //     promptedAction = "Attack";
-            // }
         }
-        else if (promptedAction.Equals("Attack") && !currentAction.Equals("Attack"))
+        else if (promptedAction == Action.Attack)
         {
             Attack();
         }
-        else if(currentAction.Equals("Attack"))
+        else if (promptedAction == Action.Idle)
         {
-            if (canDecreaseHealth)
+            Idle();
+        }
+    }
+    
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
+            if(promptedAction != Action.Attack)
             {
-                DecreaseEnemyHealthBar();
-                canDecreaseHealth = false;
-                StartCoroutine(ResetDecreaseHealthFlag());
+                promptedAction = Action.Attack;
             }
         }
     }
     
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            if(!promptedAction.Equals("Attack"))
-            {
-                promptedAction = "Attack";
-                enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
-            }
-        }
-    }
-
+    // Utils
     public void DecreaseEnemyHealthBar()
     {
         if (canDecreaseHealth)
         {
-            enemyHealthBar.DecreaseHealth();
+            enemyHealthBar.DecreaseHealth(attackDamage);
         }
     }
 
     private IEnumerator ResetDecreaseHealthFlag()
     {
-        yield return new WaitForSeconds(0.5f); // Wait for half a second
-        canDecreaseHealth = true; // Set the flag to true
+        yield return new WaitForSeconds(attackTime); // Wait for half a second
+        canDecreaseHealth = true;
+        DecreaseEnemyHealthBar();// Set the flag to true
+    }
+    
+    private IEnumerator IdleWait()
+    {
+        yield return new WaitForSeconds(idleDuration); // Wait for half a second
+        promptedAction = Action.Attack;
     }
 }

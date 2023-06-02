@@ -7,6 +7,7 @@ public class HealthBar : MonoBehaviour
 {
     public int maxHealth = 100; // Maximum health value
     private Transform childObjectHealth;
+    private float actualDamage;
 
     private int currentHealth; // Current health value
 
@@ -16,17 +17,13 @@ public class HealthBar : MonoBehaviour
         childObjectHealth = transform.Find("HealthBar");
     }
 
-    public void DecreaseHealth()
+    public void DecreaseHealth(int damage)
     {
-        currentHealth -= 5;
+        currentHealth -= damage;
 
         float healthPercentage = (float)currentHealth / maxHealth;
-        print("health percentage");
-        print(healthPercentage);
 
-        float newScaleX = childObjectHealth.localScale.x * healthPercentage;
-        print("newScaleX");
-        print(newScaleX);
+        float newScaleX = healthPercentage;
 
         Vector3 newScale = childObjectHealth.localScale;
         newScale.x = newScaleX;
