@@ -17,8 +17,7 @@ public class Pawn : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private int attackDamage;
     [SerializeField] private float idleDuration;
-
-    private float time = 0.0f;
+    
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
     
@@ -116,18 +115,6 @@ public class Pawn : MonoBehaviour
     
     void Update()
     {
-        float targetDeltaTime = 1f / 60f; // Desired time per frame for 60 FPS
-        float deltaTime = Time.deltaTime;
-
-        time += Time.deltaTime;
-
-        if (deltaTime < targetDeltaTime)
-        {
-            float remainingTime = targetDeltaTime - deltaTime;
-            System.Threading.Thread.Sleep((int)(remainingTime * 1000));
-            deltaTime = Time.deltaTime;
-        }
-
         if(promptedAction == Action.Run)
         {
             Run();
@@ -159,7 +146,11 @@ public class Pawn : MonoBehaviour
     {
         if (eventData.Equals("Hit")) enemyHealthBar.DecreaseHealth(attackDamage);
         else if (eventData.Equals("IdleStart")) promptedAction = Action.Idle;
-        else if (eventData.Equals("Disappear")) Destroy(gameObject);
+        else if (eventData.Equals("Disappear"))
+        {
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
     }
     
     public void OnDeadEvent()
