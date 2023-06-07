@@ -11,13 +11,16 @@ public class HealthBar : MonoBehaviour
     private Pawn pawn;
     private float actualDamage;
     private int currentHealth; // Current health value
+    private float length;
 
     void Start()
     {
         currentHealth = maxHealth;
         pawn = GetComponent<Pawn>();
-        
+
         childObjectHealth = transform.Find("HealthBar");
+        
+        length = childObjectHealth.localScale.x;
     }
 
     public void DecreaseHealth(int damage)
@@ -28,7 +31,7 @@ public class HealthBar : MonoBehaviour
 
             float healthPercentage = (float)currentHealth / maxHealth;
 
-            float newScaleX = healthPercentage * 0.7f;
+            float newScaleX = healthPercentage * length;
 
             Vector3 newScale = childObjectHealth.localScale;
             newScale.x = newScaleX;

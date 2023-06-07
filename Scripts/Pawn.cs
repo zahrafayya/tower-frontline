@@ -14,17 +14,26 @@ public class Pawn : MonoBehaviour
         Dead
     }
     
+    public enum ObjectType
+    {
+        PlayerTower,
+        EnemyTower,
+        Pawn
+    }
+    
     [SerializeField] private float speed;
     [SerializeField] private int attackDamage;
     [SerializeField] private float idleDuration;
-    
+    [SerializeField] private GameObject endGameScreen;
+
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
     
     private GameObject childObjectAnimation;
     private Animator animator;
     private HealthBar enemyHealthBar;
-    
+    private ObjectType objectType;
+
     private bool isDoneIdling = false;
 
     // Animation Controller
@@ -61,8 +70,10 @@ public class Pawn : MonoBehaviour
     {
         promptedAction = Action.Dead;
         currentAction = Action.Dead;
-        
-        SetAnimationDead();
+
+        if (objectType == ObjectType.EnemyTower) EndGameWin();
+        else if (objectType == ObjectType.PlayerTower) EndGameLose();
+        else SetAnimationDead();
     }
     private void Run()
     {
@@ -111,6 +122,10 @@ public class Pawn : MonoBehaviour
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
+
+        if (gameObject.name.Equals("Enemy Tower")) objectType = ObjectType.EnemyTower;
+        else if (gameObject.name.Equals("Player Tower")) objectType = ObjectType.PlayerTower;
+        else objectType = ObjectType.Pawn;
     }
     
     void Update()
@@ -142,6 +157,17 @@ public class Pawn : MonoBehaviour
     }
     
     // Utils
+
+    public void EndGameLose()
+    {
+        
+    }
+    public void EndGameWin()
+    {
+        Time.timeScale = 0f;
+        
+        endGameScreen.SetActive(true);
+    }
     public void OnAnimationEvent(string eventData)
     {
         if (eventData.Equals("Hit")) enemyHealthBar.DecreaseHealth(attackDamage);
