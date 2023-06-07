@@ -31,12 +31,24 @@ public class HealthBar : MonoBehaviour
 
             float healthPercentage = (float)currentHealth / maxHealth;
 
-            float newScaleX = healthPercentage * length;
+            if (currentHealth > 0)
+            {
+                float newScaleX = healthPercentage * length;
 
-            Vector3 newScale = childObjectHealth.localScale;
-            newScale.x = newScaleX;
+                Vector3 newScale = childObjectHealth.localScale;
+                newScale.x = newScaleX;
+                childObjectHealth.localScale = newScale;
+            }
+            else
+            {
+                Vector3 zeroScale = childObjectHealth.localScale;
+                zeroScale.x = 0;
+                childObjectHealth.localScale = zeroScale;
+            }
 
-            childObjectHealth.localScale = newScale;
+            
+
+            
 
             if (currentHealth <= 0)
             {

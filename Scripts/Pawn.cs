@@ -20,11 +20,18 @@ public class Pawn : MonoBehaviour
         EnemyTower,
         Pawn
     }
+
+    public enum Faction
+    {
+        Ally,
+        Enemy,
+    }
     
     [SerializeField] private float speed;
     [SerializeField] private int attackDamage;
     [SerializeField] private float idleDuration;
     [SerializeField] private GameObject endGameScreen;
+    [SerializeField] public int cost;
 
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
@@ -33,6 +40,7 @@ public class Pawn : MonoBehaviour
     private Animator animator;
     private HealthBar enemyHealthBar;
     private ObjectType objectType;
+    private Faction faction;
 
     private bool isDoneIdling = false;
 
@@ -86,7 +94,11 @@ public class Pawn : MonoBehaviour
         if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.Equals(("Run")))
         {
             float moveAmount = speed * Time.deltaTime;
-            transform.Translate(Vector3.right * moveAmount);
+            
+            if (faction == Faction.Ally)
+                transform.Translate(Vector3.right * moveAmount);
+            else if (faction == Faction.Enemy)
+                transform.Translate(Vector3.left * moveAmount);
         }
     }
 
@@ -126,6 +138,16 @@ public class Pawn : MonoBehaviour
         if (gameObject.name.Equals("Enemy Tower")) objectType = ObjectType.EnemyTower;
         else if (gameObject.name.Equals("Player Tower")) objectType = ObjectType.PlayerTower;
         else objectType = ObjectType.Pawn;
+
+        if (gameObject.tag.Equals("Ally")) faction = Faction.Ally;
+        else if (gameObject.tag.Equals("Enemy")) 
+        {
+            faction = Faction.Enemy;
+            
+            Vector3 reverseScale = gameObject.transform.localScale;
+            reverseScale.x = reverseScale.x * -1;
+            gameObject.transform.localScale = reverseScale;
+        }
     }
     
     void Update()
@@ -146,13 +168,34 @@ public class Pawn : MonoBehaviour
     
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        string friend;
+        string opponent;
+
+        if (faction == Faction.Ally)
+        {
+            friend = "Ally";
+            opponent = "Enemy";
+        }
+        else
+        {
+            friend = "Enemy";
+            opponent = "Ally";
+        }
+        
+        if (collision.gameObject.CompareTag(opponent))
         {
             enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
             if(promptedAction != Action.Idle && enemyHealthBar)
             {
                 promptedAction = Action.Idle;
             }
+        }
+        else if (collision.gameObject.CompareTag(friend))
+        {
+            Collider2D thisCollider = GetComponent<Collider2D>();
+            Collider2D otherCollider = collision.gameObject.GetComponent<Collider2D>();
+            
+            Physics2D.IgnoreCollision(thisCollider, otherCollider);
         }
     }
     
