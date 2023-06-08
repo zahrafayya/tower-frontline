@@ -35,13 +35,14 @@ public class Pawn : MonoBehaviour
 
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
-    
+
     private GameObject childObjectAnimation;
     private Animator animator;
     private HealthBar enemyHealthBar;
     private ObjectType objectType;
     private Faction faction;
-
+    private Scoring playerScore;
+    private Scoring enemyScore;
     private bool isDoneIdling = false;
 
     // Animation Controller
@@ -79,9 +80,14 @@ public class Pawn : MonoBehaviour
         promptedAction = Action.Dead;
         currentAction = Action.Dead;
 
-        if (objectType == ObjectType.EnemyTower) EndGameWin();
-        else if (objectType == ObjectType.PlayerTower) EndGameLose();
-        else SetAnimationDead();
+        if (objectType == ObjectType.EnemyTower || objectType == ObjectType.PlayerTower) EndGame();
+        else
+        {
+            if (faction == Faction.Enemy) playerScore.IncreaseScore();
+            else if (faction == Faction.Ally) enemyScore.IncreaseScore();
+            
+            SetAnimationDead();
+        }
     }
     private void Run()
     {
@@ -148,6 +154,19 @@ public class Pawn : MonoBehaviour
             reverseScale.x = reverseScale.x * -1;
             gameObject.transform.localScale = reverseScale;
         }
+        
+        Scoring[] scoringComponents = FindObjectsOfType<Scoring>();
+
+        foreach (Scoring scoringComponent in scoringComponents)
+        {
+            if (scoringComponent.gameObject.CompareTag("Ally"))
+            {
+                playerScore = scoringComponent;
+            }
+            else enemyScore = scoringComponent;
+        }
+        
+        
     }
     
     void Update()
@@ -162,7 +181,8 @@ public class Pawn : MonoBehaviour
         }
         else if (promptedAction == Action.Idle)
         {
-            Idle();
+            if (enemyHealthBar) Idle();
+            else promptedAction = Action.Run;
         }
     }
     
@@ -185,7 +205,7 @@ public class Pawn : MonoBehaviour
         if (collision.gameObject.CompareTag(opponent))
         {
             enemyHealthBar = collision.gameObject.GetComponent<HealthBar>();
-            if(promptedAction != Action.Idle && enemyHealthBar)
+            if (promptedAction != Action.Idle && enemyHealthBar)
             {
                 promptedAction = Action.Idle;
             }
@@ -200,12 +220,7 @@ public class Pawn : MonoBehaviour
     }
     
     // Utils
-
-    public void EndGameLose()
-    {
-        
-    }
-    public void EndGameWin()
+    public void EndGame()
     {
         Time.timeScale = 0f;
         
