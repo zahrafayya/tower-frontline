@@ -86,6 +86,7 @@ public class Pawn : MonoBehaviour
             if (faction == Faction.Enemy) playerScore.IncreaseScore();
             else if (faction == Faction.Ally) enemyScore.IncreaseScore();
             
+            Debug.Log("masuk");
             SetAnimationDead();
         }
     }

@@ -12,13 +12,16 @@ public class Scoring : MonoBehaviour
     private int score = 0;
     void Start()
     {
-        scoreText = scoreUI.GetComponent<TextMeshProUGUI>();
+        if (scoreUI)
+            scoreText = scoreUI.GetComponent<TextMeshProUGUI>();
     }
 
     public void IncreaseScore()
     {
         score++;
-        scoreText.text = score.ToString();  
+        
+        if(scoreText)
+            scoreText.text = score.ToString();  
         
         if (score == 3) spawner.IncreaseMaxCoin(15);
         if (score == 7) spawner.IncreaseMaxCoin(20);

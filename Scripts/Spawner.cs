@@ -24,7 +24,7 @@ public class Spawner : MonoBehaviour
     private int coinValue = 10;
     private int maxCoinValue = 10;
     private float timer = 0f;
-    private float incrementInterval = 1f;
+    private float incrementInterval = 1.5f;
     void Start()
     {
         coinText = coinUI.GetComponent<TextMeshProUGUI>();
@@ -48,7 +48,7 @@ public class Spawner : MonoBehaviour
             }
         }
         
-        if (type == Type.Ally)
+        if (coinText)
         {
             coinText.text = coinValue.ToString();   
         }
@@ -58,7 +58,7 @@ public class Spawner : MonoBehaviour
     {
         maxCoinValue = maxCoin;
         
-        if (type == Type.Ally)
+        if (maxCoinText)
         {
             maxCoinText.text = maxCoinValue.ToString();   
         }
