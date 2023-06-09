@@ -21,7 +21,7 @@ public class Spawner : MonoBehaviour
     private TextMeshProUGUI coinText;
     private TextMeshProUGUI maxCoinText;
     private Type type;
-    private int coinValue = 10;
+    public int coinValue = 10;
     private int maxCoinValue = 10;
     private float timer = 0f;
     private float incrementInterval = 1.5f;

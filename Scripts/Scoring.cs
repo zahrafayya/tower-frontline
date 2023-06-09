@@ -7,6 +7,8 @@ public class Scoring : MonoBehaviour
 {
     [SerializeField] public GameObject scoreUI;
     [SerializeField] public Spawner spawner;
+    [SerializeField] public AgentAI playerAgentAI;
+    [SerializeField] public AgentAI enemyAgentAI;
     
     private TextMeshProUGUI scoreText;
     public int score = 0;
@@ -22,6 +24,10 @@ public class Scoring : MonoBehaviour
         
         if(scoreText)
             scoreText.text = score.ToString();  
+        if(playerAgentAI)
+            playerAgentAI.KillReward();
+        if(enemyAgentAI)
+            enemyAgentAI.DeathPenalty();
         
         if (score == 3) spawner.IncreaseMaxCoin(15);
         if (score == 7) spawner.IncreaseMaxCoin(20);

@@ -10,7 +10,7 @@ public class HealthBar : MonoBehaviour
     private Transform childObjectHealth;
     private Pawn pawn;
     private float actualDamage;
-    private int currentHealth; // Current health value
+    public int currentHealth; // Current health value
     private float length;
 
     void Start()

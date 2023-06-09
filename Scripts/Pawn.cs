@@ -31,9 +31,11 @@ public class Pawn : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private int attackDamage;
     [SerializeField] private float idleDuration;
-    [SerializeField] private GameObject endGameScreen;
     [SerializeField] public int cost;
+    [SerializeField] private GameObject endGameScreen;
     [SerializeField] public GameObject scoreEndScreen;
+    [SerializeField] public AgentAI playerAI;
+    [SerializeField] public AgentAI enemyAI;
 
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
@@ -83,7 +85,12 @@ public class Pawn : MonoBehaviour
         promptedAction = Action.Dead;
         currentAction = Action.Dead;
 
-        if (objectType == ObjectType.EnemyTower || objectType == ObjectType.PlayerTower) EndGame();
+        if (objectType == ObjectType.EnemyTower || objectType == ObjectType.PlayerTower)
+        {
+            if (playerAI) playerAI.WinReward();
+            if (enemyAI) enemyAI.LosePenalty();
+            EndGame();
+        }
         else
         {
             if (faction == Faction.Enemy) playerScore.IncreaseScore();
