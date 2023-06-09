@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Pawn : MonoBehaviour
@@ -32,6 +33,7 @@ public class Pawn : MonoBehaviour
     [SerializeField] private float idleDuration;
     [SerializeField] private GameObject endGameScreen;
     [SerializeField] public int cost;
+    [SerializeField] public GameObject scoreEndScreen;
 
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
@@ -44,6 +46,7 @@ public class Pawn : MonoBehaviour
     private Scoring playerScore;
     private Scoring enemyScore;
     private bool isDoneIdling = false;
+    private TextMeshProUGUI scoreText;
 
     // Animation Controller
     private void SetAnimationDead()
@@ -86,7 +89,6 @@ public class Pawn : MonoBehaviour
             if (faction == Faction.Enemy) playerScore.IncreaseScore();
             else if (faction == Faction.Ally) enemyScore.IncreaseScore();
             
-            Debug.Log("masuk");
             SetAnimationDead();
         }
     }
@@ -167,7 +169,8 @@ public class Pawn : MonoBehaviour
             else enemyScore = scoringComponent;
         }
         
-        
+        if (scoreEndScreen)
+            scoreText = scoreEndScreen.GetComponent<TextMeshProUGUI>();
     }
     
     void Update()
@@ -225,6 +228,10 @@ public class Pawn : MonoBehaviour
     {
         Time.timeScale = 0f;
         
+        scoreText.text = $"Total Score: {playerScore.score}";
+        
+        Debug.Log(scoreText.text);
+
         endGameScreen.SetActive(true);
     }
     public void OnAnimationEvent(string eventData)

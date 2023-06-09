@@ -9,7 +9,7 @@ public class Scoring : MonoBehaviour
     [SerializeField] public Spawner spawner;
     
     private TextMeshProUGUI scoreText;
-    private int score = 0;
+    public int score = 0;
     void Start()
     {
         if (scoreUI)
