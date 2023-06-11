@@ -43,7 +43,7 @@ public class Pawn : MonoBehaviour
     private GameObject childObjectAnimation;
     private Animator animator;
     private HealthBar enemyHealthBar;
-    private ObjectType objectType;
+    public ObjectType objectType;
     private Faction faction;
     private Scoring playerScore;
     private Scoring enemyScore;
@@ -236,8 +236,6 @@ public class Pawn : MonoBehaviour
         Time.timeScale = 0f;
         
         scoreText.text = $"Total Score: {playerScore.score}";
-        
-        Debug.Log(scoreText.text);
 
         endGameScreen.SetActive(true);
     }

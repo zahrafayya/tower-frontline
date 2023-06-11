@@ -1,0 +1,29 @@
+{
+    "Spawn": {
+        "checkpoints": [
+            {
+                "steps": 31754,
+                "file_path": "results\\Test10\\Spawn\\Spawn-31754.onnx",
+                "reward": null,
+                "creation_time": 1686506578.576342,
+                "auxillary_file_paths": [
+                    "results\\Test10\\Spawn\\Spawn-31754.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 31754,
+            "file_path": "results\\Test10\\Spawn.onnx",
+            "reward": null,
+            "creation_time": 1686506578.576342,
+            "auxillary_file_paths": [
+                "results\\Test10\\Spawn\\Spawn-31754.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.29.0",
+        "torch_version": "2.0.1+cpu"
+    }
+}

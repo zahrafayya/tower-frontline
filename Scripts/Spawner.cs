@@ -22,7 +22,7 @@ public class Spawner : MonoBehaviour
     private TextMeshProUGUI maxCoinText;
     private Type type;
     public int coinValue = 10;
-    private int maxCoinValue = 10;
+    public int maxCoinValue = 10;
     private float timer = 0f;
     private float incrementInterval = 1.5f;
     void Start()

@@ -183,8 +183,12 @@ MonoBehaviour:
   speed: 7
   attackDamage: 4
   idleDuration: 1
-  endGameScreen: {fileID: 0}
   cost: 7
+  endGameScreen: {fileID: 0}
+  scoreEndScreen: {fileID: 0}
+  playerAI: {fileID: 0}
+  enemyAI: {fileID: 0}
+  objectType: 2
 --- !u!114 &2678237204982575928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,6 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 40
+  currentHealth: 0
 --- !u!1 &2678237205501494502
 GameObject:
   m_ObjectHideFlags: 0

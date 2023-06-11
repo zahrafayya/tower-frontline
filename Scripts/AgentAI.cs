@@ -8,46 +8,69 @@ using Unity.MLAgents.Sensors;
 
 public class AgentAI : Agent
 {
-    [SerializeField] private GameObject enemyScoreObject;
-    [SerializeField] private GameObject playerScoreObject;
-    [SerializeField] private GameObject enemyHealthObject;
-    [SerializeField] private GameObject playerHealthObject;
+    [SerializeField] private Scoring enemyScore;
+    [SerializeField] private Scoring playerScore;
+    [SerializeField] private HealthBar enemyHealthObject;
+    [SerializeField] private HealthBar playerHealthObject;
 
     private Spawner spawner;
     private int receivedAction = 0;
     private int currentAction = 0;
-    private int enemyScore;
-    private int playerScore;
+    private int enemyScoreValue;
+    private int playerScoreValue;
     private int coin;
-    private int enemyHealth;
-    private int playerHealth;
+    private int enemyHealthValue;
+    private int playerHealthValue;
 
     private void Start()
     {
-        enemyScore = enemyScoreObject.GetComponent<Scoring>().score;
-        playerScore = playerScoreObject.GetComponent<Scoring>().score;
         spawner = gameObject.GetComponent<Spawner>();
         coin = spawner.coinValue;
+    }
+
+    private void Update()
+    {
+        enemyScoreValue = enemyScore.score;
+        playerScoreValue = playerScore.score;
+
+        enemyHealthValue = enemyHealthObject.currentHealth;
+        playerHealthValue = playerHealthObject.currentHealth;
+    }
+
+
+    public override void OnEpisodeBegin()
+    {
+        playerHealthObject.currentHealth = 100;
+        enemyHealthObject.currentHealth = 100;
+
+        spawner.coinValue = 10;
+        spawner.maxCoinValue = 10;
+
+        enemyScore.score = 0;
+        playerScore.score = 0;
         
-        if (playerHealthObject)
-            playerHealth = playerHealthObject.GetComponent<HealthBar>().currentHealth;
+        Pawn[] pawnComponents = FindObjectsOfType<Pawn>();
         
-        if (enemyHealthObject)
-            enemyHealth = enemyHealthObject.GetComponent<HealthBar>().currentHealth;
+        foreach (Pawn pawnComponent in pawnComponents)
+        {
+            if (pawnComponent.objectType == Pawn.ObjectType.Pawn)
+            {
+                Destroy(pawnComponent.gameObject);
+            }
+        }
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(enemyScore);
-        sensor.AddObservation(playerScore);
+        sensor.AddObservation(enemyScoreValue);
+        sensor.AddObservation(playerScoreValue);
         sensor.AddObservation(coin);
-        sensor.AddObservation(playerHealth);
-        sensor.AddObservation(enemyHealth);
+        sensor.AddObservation(playerHealthValue);
+        sensor.AddObservation(enemyHealthValue);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        Debug.Log(actions.DiscreteActions[0]);
         receivedAction = actions.DiscreteActions[0];
         
         if (currentAction != receivedAction)
@@ -106,12 +129,12 @@ public class AgentAI : Agent
     public void LosePenalty()
     {
         SetReward(-25f);
-        EndEpisode();
+        // EndEpisode();
     }
 
     public void WinReward()
     {
         SetReward(+25f);
-        EndEpisode();
+        // EndEpisode();
     }
 }

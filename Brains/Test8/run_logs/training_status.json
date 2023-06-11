@@ -1,0 +1,51 @@
+{
+    "SpawnEnemy": {
+        "checkpoints": [
+            {
+                "steps": 10461,
+                "file_path": "results\\Test8\\SpawnEnemy\\SpawnEnemy-10461.onnx",
+                "reward": null,
+                "creation_time": 1686362257.0031593,
+                "auxillary_file_paths": [
+                    "results\\Test8\\SpawnEnemy\\SpawnEnemy-10461.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 10461,
+            "file_path": "results\\Test8\\SpawnEnemy.onnx",
+            "reward": null,
+            "creation_time": 1686362257.0031593,
+            "auxillary_file_paths": [
+                "results\\Test8\\SpawnEnemy\\SpawnEnemy-10461.pt"
+            ]
+        }
+    },
+    "SpawnPlayer": {
+        "checkpoints": [
+            {
+                "steps": 10461,
+                "file_path": "results\\Test8\\SpawnPlayer\\SpawnPlayer-10461.onnx",
+                "reward": null,
+                "creation_time": 1686362257.1056285,
+                "auxillary_file_paths": [
+                    "results\\Test8\\SpawnPlayer\\SpawnPlayer-10461.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 10461,
+            "file_path": "results\\Test8\\SpawnPlayer.onnx",
+            "reward": null,
+            "creation_time": 1686362257.1056285,
+            "auxillary_file_paths": [
+                "results\\Test8\\SpawnPlayer\\SpawnPlayer-10461.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.29.0",
+        "torch_version": "2.0.1+cpu"
+    }
+}
