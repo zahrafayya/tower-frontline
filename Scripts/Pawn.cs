@@ -37,6 +37,9 @@ public class Pawn : MonoBehaviour
     [SerializeField] public AgentAI playerAI;
     [SerializeField] public AgentAI enemyAI;
 
+    [SerializeField] public AudioSource audioSource;
+    [SerializeField] public AudioClip endAudio;
+
     private Action currentAction = Action.Null;
     private Action promptedAction = Action.Run;
 
@@ -49,6 +52,7 @@ public class Pawn : MonoBehaviour
     private Scoring enemyScore;
     private bool isDoneIdling = false;
     private TextMeshProUGUI scoreText;
+
 
     // Animation Controller
     private void SetAnimationDead()
@@ -149,6 +153,8 @@ public class Pawn : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1;
+        
         animator = GetComponentInChildren<Animator>();
 
         if (gameObject.name.Equals("Enemy Tower")) objectType = ObjectType.EnemyTower;
@@ -236,6 +242,9 @@ public class Pawn : MonoBehaviour
         Time.timeScale = 0f;
         
         scoreText.text = $"Total Score: {playerScore.score}";
+        
+        audioSource.clip = endAudio;
+        audioSource.Play();
 
         endGameScreen.SetActive(true);
     }
